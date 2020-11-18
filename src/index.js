@@ -7,7 +7,7 @@ const run = async () => {
   try {
     // Get inputs from workflow file
     const releasePaths = core.getInput('release_paths', { required: true })
-    const uploadUrl = core.getInput('upload_url', { required: true })
+    const tagName = core.getInput('tag_name', { required: true })
 
     const filemanager = new FileManager()
     const filelist = filemanager.resolveFiles(releasePaths)
@@ -15,7 +15,11 @@ const run = async () => {
     core.debug(`Found ${filelist.length} asset(s)`)
     core.debug(filelist.join('\n'))
 
-    const uploadManager = new UploadManager({ uploadUrl })
+    const options = {
+      tagName
+    }
+
+    const uploadManager = new UploadManager(options)
 
     let downloadUrls = []
 
@@ -30,7 +34,7 @@ const run = async () => {
 
     core.setOutput('browser_download_urls', JSON.stringify(downloadUrls))
   } catch (e) {
-    core.setFailed(e)
+    core.setFailed(e.message)
   }
 }
 

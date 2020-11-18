@@ -9115,7 +9115,7 @@ const run = async () => {
   try {
     // Get inputs from workflow file
     const releasePaths = core.getInput('release_paths', { required: true })
-    const uploadUrl = core.getInput('upload_url', { required: true })
+    const tagName = core.getInput('tag_name', { required: true })
 
     const filemanager = new FileManager()
     const filelist = filemanager.resolveFiles(releasePaths)
@@ -9123,7 +9123,11 @@ const run = async () => {
     core.debug(`Found ${filelist.length} asset(s)`)
     core.debug(filelist.join('\n'))
 
-    const uploadManager = new UploadManager({ uploadUrl })
+    const options = {
+      tagName
+    }
+
+    const uploadManager = new UploadManager(options)
 
     let downloadUrls = []
 
@@ -9138,7 +9142,7 @@ const run = async () => {
 
     core.setOutput('browser_download_urls', JSON.stringify(downloadUrls))
   } catch (e) {
-    core.setFailed(e)
+    core.setFailed(e.message)
   }
 }
 
@@ -9156,13 +9160,31 @@ const core = __webpack_require__(8460)
 const github = __webpack_require__(8369)
 
 class UploadManager {
-  constructor({ uploadUrl }) {
-    this.uploadUrl = uploadUrl
+  constructor({ tagName }) {
+    this.tagName = tagName
   }
 
   async uploadFile(filePath) {
     try {
       const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+
+      const repo = 'eve-solver-ws-trigger'
+      const owner = 'boxpositron'
+
+      const assets = await octokit.repos.listReleases({
+        repo,
+        owner
+      })
+
+      const release = assets.find(
+        (asset) => asset.data.tag_name == this.tagName
+      )
+
+      if (!release) {
+        throw new Error('Tag name not found')
+      }
+
+      const { upload_url } = release
 
       // Determine content-length for header to upload asset
       const contentLength = fs.statSync(filePath).size
@@ -9177,7 +9199,7 @@ class UploadManager {
       // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
       // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
       const uploadAssetResponse = await octokit.repos.uploadReleaseAsset({
-        url: this.uploadUrl,
+        url: upload_url,
         headers,
         name: path.basename(filePath),
         file: fs.readFileSync(filePath)
@@ -9190,7 +9212,7 @@ class UploadManager {
 
       return browserDownloadUrl
     } catch (e) {
-      core.debug(e)
+      core.debug(e.message)
       return null
     }
   }
