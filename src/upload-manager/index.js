@@ -1,16 +1,17 @@
 const fs = require('fs')
 const path = require('path')
 const core = require('@actions/core')
-const { GitHub } = require('@actions/github')
+const github = require('@actions/github')
 
 class UploadManager {
   constructor({ uploadUrl }) {
-    this.github = new GitHub(process.env.GITHUB_TOKEN)
     this.uploadUrl = uploadUrl
   }
 
   async uploadFile(filePath) {
     try {
+      const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+
       // Determine content-length for header to upload asset
       const contentLength = fs.statSync(filePath).size
 
@@ -23,7 +24,7 @@ class UploadManager {
       // Upload a release asset
       // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
       // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
-      const uploadAssetResponse = await this.github.repos.uploadReleaseAsset({
+      const uploadAssetResponse = await octokit.repos.uploadReleaseAsset({
         url: this.uploadUrl,
         headers,
         name: path.basename(filePath),
