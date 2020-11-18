@@ -23,7 +23,7 @@ class UploadManager {
       // Upload a release asset
       // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
       // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
-      const uploadAssetResponse = await github.repos.uploadReleaseAsset({
+      const uploadAssetResponse = await this.github.repos.uploadReleaseAsset({
         url: this.uploadUrl,
         headers,
         name: path.basename(filePath),
