@@ -5,8 +5,8 @@ inputs:
   release_paths:
     description: 'Specify the path to the assets you want to upload'
     required: true
-  upload_url:
-    description: 'Specify upload url'
+  tag_name:
+    description: 'Specify tag name'
     required: true
 outputs:
   browser_download_urls:
