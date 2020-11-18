@@ -9112,26 +9112,34 @@ const { UploadManager } = __webpack_require__(1179)
 const { FileManager } = __webpack_require__(9070)
 
 const run = async () => {
-  // Get inputs from workflow file
-  const releasePaths = core.getInput('release_paths', { required: true })
-  const uploadUrl = core.getInput('upload_url', { required: true })
+  try {
+    // Get inputs from workflow file
+    const releasePaths = core.getInput('release_paths', { required: true })
+    const uploadUrl = core.getInput('upload_url', { required: true })
 
-  const filemanager = new FileManager()
-  const filelist = filemanager.resolveFiles(releasePaths)
+    const filemanager = new FileManager()
+    const filelist = filemanager.resolveFiles(releasePaths)
 
-  core.debug(`Found ${filelist.length} asset(s)`)
-  core.debug(filelist.join('\n'))
+    core.debug(`Found ${filelist.length} asset(s)`)
+    core.debug(filelist.join('\n'))
 
-  const uploadManager = new UploadManager({ uploadUrl })
+    const uploadManager = new UploadManager({ uploadUrl })
 
-  let downloadUrls = []
+    let downloadUrls = []
 
-  for (let file of filelist) {
-    const downloadUrl = await uploadManager.uploadFile(file)
-    downloadUrls = [...downloadUrls, { url: downloadUrl, file }]
+    for (let file of filelist) {
+      core.debug(`Uploading ${file}`)
+      const downloadUrl = await uploadManager.uploadFile(file)
+      if (downloadUrl) {
+        core.debug(`Uploaded ${file}`)
+        downloadUrls = [...downloadUrls, { url: downloadUrl, file }]
+      }
+    }
+
+    core.setOutput('browser_download_urls', JSON.stringify(downloadUrls))
+  } catch (e) {
+    core.setFailed(e)
   }
-
-  core.setOutput('browser_download_urls', JSON.stringify(downloadUrls))
 }
 
 run()
