@@ -1,0 +1,19 @@
+name: 'Upload Multiple Release Assets'
+description: 'Upload multiple release assets'
+author: 'boxpositron'
+inputs:
+  release_paths:
+    description: 'Specify the path to the assets you want to upload'
+    required: true
+  upload_url:
+    description: 'Specify upload url'
+    required: true
+outputs:
+  browser_download_urls:
+    description: 'Download URLs for uploaded assets'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'upload'
+  color: 'green'
