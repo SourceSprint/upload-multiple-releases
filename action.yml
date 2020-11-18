@@ -1,4 +1,4 @@
-name: 'Upload Multiple Release Assets'
+name: 'Publish all release assets'
 description: 'Upload multiple release assets'
 author: 'boxpositron'
 inputs:
