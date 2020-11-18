@@ -1,0 +1,31 @@
+{
+  "name": "upload-multiple-releases",
+  "version": "1.0.0",
+  "description": "Upload multiple release assets ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ncc build src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boxpositron/upload-multiple-releases.git"
+  },
+  "keywords": [
+    "node",
+    "release",
+    "actions",
+    "upload"
+  ],
+  "author": "boxpositron",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boxpositron/upload-multiple-releases/issues"
+  },
+  "homepage": "https://github.com/boxpositron/upload-multiple-releases#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "glob": "^7.1.6"
+  }
+}
