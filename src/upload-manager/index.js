@@ -42,8 +42,8 @@ class UploadManager {
         owner: this.owner
       })
 
-      const release = assets.find(
-        (asset) => asset.data.tag_name == this.tagName
+      const release = assets.data.find(
+        (asset) => asset.tag_name == this.tagName
       )
 
       if (release && !this.overwrite) {
