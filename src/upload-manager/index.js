@@ -110,8 +110,6 @@ class UploadManager {
         data: fs.readFileSync(filePath)
       }
 
-      core.info(options.data)
-
       const response = await this.octokit.repos.uploadReleaseAsset(options)
 
       // Get the browser_download_url for the uploaded release asset from the response
