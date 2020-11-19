@@ -4,13 +4,16 @@ class FileManager {
   resolveFiles(filelist) {
     const paths = `${filelist}`.split('\n').filter((line) => line.trim().length)
 
-    const files = paths.map((filePath) => {
+    const files = paths.map((fileConfig) => {
+      const [filePath, fileType = null] = fileConfig.split(' ')
+
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        return glob.sync(filePath)
+        const config = glob.sync(filePath)
+        return config.map((file) => ({ filePath: file, fileType }))
       }
 
-      return [filePath]
+      return [{ filePath, fileType }]
     })
 
     return [].concat(...files)
