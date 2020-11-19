@@ -8,6 +8,18 @@ inputs:
   tag_name:
     description: 'Specify tag name'
     required: true
+  release_name:
+    description: 'Specify release name'
+    required: false
+  overwrite:
+    description: 'Overwrite existing assets'
+    required: false
+  draft:
+    description: 'Create release as draft'
+    required: false
+  prerelease:
+    description: 'Mark release as prerelease'
+    required: false
 outputs:
   browser_download_urls:
     description: 'Download URLs for uploaded assets'
