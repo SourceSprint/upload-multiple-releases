@@ -2,8 +2,8 @@ name: 'Publish all release assets'
 description: 'Upload multiple release assets'
 author: 'boxpositron'
 inputs:
-  release_paths:
-    description: 'Specify the path to the assets you want to upload'
+  release_config:
+    description: 'Path / filetype config'
     required: true
   tag_name:
     description: 'Specify tag name'
