@@ -7,7 +7,8 @@ class FileManager {
     const files = paths.map((filePath) => {
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        return glob.sync(filePath).split(',')
+        const targets = glob.sync(filePath)
+        return targets.split(',')
       }
 
       return [filePath]
