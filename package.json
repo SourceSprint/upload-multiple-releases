@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build src"
+    "build": "ncc build src",
+    "precommit": "npm run build && git add dist/"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,8 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "glob": "^7.1.6"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.25.1"
   }
 }
