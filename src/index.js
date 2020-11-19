@@ -1,12 +1,11 @@
 const core = require('@actions/core')
-
 const { UploadManager } = require('./upload-manager')
 const { FileManager } = require('./file-manager')
 
 const run = async () => {
   try {
     // Get inputs from workflow file
-    const releasePaths = core.getInput('release_paths', { required: true })
+    const releaseConfig = core.getInput('release_config', { required: true })
     const tagName = core.getInput('tag_name', { required: true })
     const releaseName = core.getInput('release_name', { required: false })
 
@@ -16,10 +15,10 @@ const run = async () => {
       core.getInput('prerelease', { required: false }) === 'true'
 
     const filemanager = new FileManager()
-    const filelist = filemanager.resolveFiles(releasePaths)
+    const filelist = filemanager.resolveFiles(releaseConfig)
 
     core.info(`Found ${filelist.length} asset(s)`)
-    core.info(filelist.join('\n'))
+    core.info(filelist.map((file) => file.filePath).join('\n'))
 
     const options = {
       draft,
@@ -35,12 +34,17 @@ const run = async () => {
 
     await uploadManager.resolveTag()
 
-    for (let file of filelist) {
-      core.info(`Uploading ${file}`)
-      const downloadUrl = await uploadManager.uploadFile(file)
+    for (let fileConfig of filelist) {
+      const { filePath } = fileConfig
+
+      core.info(`Uploading ${filePath}`)
+
+      const downloadUrl = await uploadManager.uploadFile(fileConfig)
+
       if (downloadUrl) {
-        core.info(`Uploaded ${file}`)
-        downloadUrls = [...downloadUrls, { url: downloadUrl, file }]
+        core.info(`Uploaded ${filePath}`)
+
+        downloadUrls = [...downloadUrls, { url: downloadUrl, filePath }]
       }
     }
 

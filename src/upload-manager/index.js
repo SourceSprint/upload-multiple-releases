@@ -84,7 +84,7 @@ class UploadManager {
     }
   }
 
-  async uploadFile(filePath) {
+  async uploadFile({ filePath, fileType }) {
     try {
       if (!this.uploadUrl) {
         throw new CriticalError('Unresolved Tag')
@@ -95,7 +95,7 @@ class UploadManager {
 
       // Setup headers for API call, see Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset for more information
       const headers = {
-        'content-type': 'binary/octet-stream',
+        'content-type': fileType || 'binary/octet-stream',
         'content-length': contentLength
       }
 

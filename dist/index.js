@@ -9083,13 +9083,16 @@ class FileManager {
   resolveFiles(filelist) {
     const paths = `${filelist}`.split('\n').filter((line) => line.trim().length)
 
-    const files = paths.map((filePath) => {
+    const files = paths.map((fileConfig) => {
+      const [filePath, fileType = null] = fileConfig.split(' ')
+
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        return glob.sync(filePath)
+        const config = glob.sync(filePath)
+        return config.map((file) => ({ filePath: file, fileType }))
       }
 
-      return [filePath]
+      return [{ filePath, fileType }]
     })
 
     return [].concat(...files)
@@ -9107,14 +9110,13 @@ module.exports = {
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 const core = __webpack_require__(2186)
-
 const { UploadManager } = __webpack_require__(2427)
 const { FileManager } = __webpack_require__(2532)
 
 const run = async () => {
   try {
     // Get inputs from workflow file
-    const releasePaths = core.getInput('release_paths', { required: true })
+    const releaseConfig = core.getInput('release_config', { required: true })
     const tagName = core.getInput('tag_name', { required: true })
     const releaseName = core.getInput('release_name', { required: false })
 
@@ -9124,10 +9126,10 @@ const run = async () => {
       core.getInput('prerelease', { required: false }) === 'true'
 
     const filemanager = new FileManager()
-    const filelist = filemanager.resolveFiles(releasePaths)
+    const filelist = filemanager.resolveFiles(releaseConfig)
 
     core.info(`Found ${filelist.length} asset(s)`)
-    core.info(filelist.join('\n'))
+    core.info(filelist.map((file) => file.filePath).join('\n'))
 
     const options = {
       draft,
@@ -9143,12 +9145,17 @@ const run = async () => {
 
     await uploadManager.resolveTag()
 
-    for (let file of filelist) {
-      core.info(`Uploading ${file}`)
-      const downloadUrl = await uploadManager.uploadFile(file)
+    for (let fileConfig of filelist) {
+      const { filePath } = fileConfig
+
+      core.info(`Uploading ${filePath}`)
+
+      const downloadUrl = await uploadManager.uploadFile(fileConfig)
+
       if (downloadUrl) {
-        core.info(`Uploaded ${file}`)
-        downloadUrls = [...downloadUrls, { url: downloadUrl, file }]
+        core.info(`Uploaded ${filePath}`)
+
+        downloadUrls = [...downloadUrls, { url: downloadUrl, filePath }]
       }
     }
 
@@ -9254,7 +9261,7 @@ class UploadManager {
     }
   }
 
-  async uploadFile(filePath) {
+  async uploadFile({ filePath, fileType }) {
     try {
       if (!this.uploadUrl) {
         throw new CriticalError('Unresolved Tag')
@@ -9265,7 +9272,7 @@ class UploadManager {
 
       // Setup headers for API call, see Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset for more information
       const headers = {
-        'content-type': 'binary/octet-stream',
+        'content-type': fileType || 'binary/octet-stream',
         'content-length': contentLength
       }
 
