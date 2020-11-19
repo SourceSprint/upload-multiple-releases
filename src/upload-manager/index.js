@@ -3,32 +3,93 @@ const path = require('path')
 const core = require('@actions/core')
 const github = require('@actions/github')
 
+class CriticalError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'CriticalError'
+  }
+}
 class UploadManager {
-  constructor({ tagName }) {
-    this.tagName = tagName
+  constructor({
+    tagName = '',
+    releaseName = '',
+    overwrite = false,
+    prerelease = false,
+    draft = false
+  }) {
+    this.tagName = tagName.replace('refs/tags/', '')
+    this.releaseName = releaseName.replace('refs/tags/', '')
+
+    this.overwrite = overwrite
+    this.prerelease = prerelease
+    this.draft = draft
+
+    this.octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+
+    this.repo = github.context.repo
+    this.owner = github.context.owner
+    this.sha = github.context.sha
+
+    this.uploadUrl = null
   }
 
-  async uploadFile(filePath) {
+  async resolveTag() {
     try {
-      const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+      core.info('Resolving tag')
 
-      const repo = 'eve-solver-ws-trigger'
-      const owner = 'boxpositron'
-
-      const assets = await octokit.repos.listReleases({
-        repo,
-        owner
+      const assets = await this.octokit.repos.listReleases({
+        repo: this.repo,
+        owner: this.owner
       })
 
       const release = assets.find(
         (asset) => asset.data.tag_name == this.tagName
       )
 
-      if (!release) {
-        throw new Error('Tag name not found')
+      if (release && !this.overwrite) {
+        throw new CriticalError('Release already exists.')
       }
 
-      const { upload_url } = release
+      if (release && this.overwrite) {
+        core.info('Release exists, overwriting assets.')
+        this.uploadUrl = release.upload_url
+        return
+      }
+
+      let releaseName = this.tagName.replace('v', '')
+
+      if (this.releaseName.length) {
+        releaseName = this.releaseName
+      }
+
+      core.info('Creating release.')
+      const newRelease = await this.octokit.repos.createRelease({
+        owner: this.owner,
+        repo: this.repo,
+        tag_name: this.tagName,
+        name: releaseName,
+        body: '',
+        draft: this.draft,
+        prerelease: this.prerelease,
+        target_commitish: this.sha
+      })
+
+      const {
+        data: { upload_url: uploadUrl }
+      } = newRelease
+
+      this.uploadUrl = uploadUrl
+    } catch (e) {
+      core.setFailed(e.message)
+    }
+  }
+
+  async uploadFile(filePath) {
+    try {
+      if (!this.uploadUrl) {
+        core.info('Missing upload url, resolving.')
+        await this.resolveTag()
+      }
 
       // Determine content-length for header to upload asset
       const contentLength = fs.statSync(filePath).size
@@ -42,21 +103,28 @@ class UploadManager {
       // Upload a release asset
       // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
       // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
-      const uploadAssetResponse = await octokit.repos.uploadReleaseAsset({
-        url: upload_url,
+
+      const uploadAssetResponse = await this.octokit.repos.uploadReleaseAsset({
+        url: this.uploadUrl,
         headers,
         name: path.basename(filePath),
         file: fs.readFileSync(filePath)
       })
 
       // Get the browser_download_url for the uploaded release asset from the response
+
       const {
         data: { browser_download_url: browserDownloadUrl }
       } = uploadAssetResponse
 
       return browserDownloadUrl
     } catch (e) {
-      core.debug(e.message)
+      if (e instanceof CriticalError) {
+        core.setFailed(e.message)
+      } else {
+        core.error(e)
+      }
+
       return null
     }
   }
