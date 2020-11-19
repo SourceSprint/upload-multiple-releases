@@ -9086,13 +9086,13 @@ class FileManager {
     const files = paths.map((filePath) => {
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        return glob.sync(filePath)
+        return glob.sync(filePath).split(',')
       }
 
-      return filePath
+      return [filePath]
     })
 
-    return files
+    return [].concat(...files)
   }
 }
 
@@ -9196,8 +9196,8 @@ class UploadManager {
 
     this.octokit = github.getOctokit(process.env.GITHUB_TOKEN)
 
-    this.repo = github.context.repo
-    this.owner = github.context.owner
+    this.repo = github.context.repo.repo
+    this.owner = github.context.repo.owner
     this.sha = github.context.sha
 
     this.uploadUrl = null
@@ -9257,8 +9257,7 @@ class UploadManager {
   async uploadFile(filePath) {
     try {
       if (!this.uploadUrl) {
-        core.info('Missing upload url, resolving.')
-        await this.resolveTag()
+        throw new CriticalError('Unresolved Tag')
       }
 
       // Determine content-length for header to upload asset
