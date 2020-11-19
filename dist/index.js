@@ -9086,8 +9086,7 @@ class FileManager {
     const files = paths.map((filePath) => {
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        const targets = glob.sync(filePath)
-        return targets.split(',')
+        return glob.sync(filePath)
       }
 
       return [filePath]
