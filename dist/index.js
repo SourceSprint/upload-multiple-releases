@@ -9280,18 +9280,22 @@ class UploadManager {
       // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
       // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
 
-      const uploadAssetResponse = await this.octokit.repos.uploadReleaseAsset({
+      const options = {
         url: this.uploadUrl,
         headers,
         name: path.basename(filePath),
-        file: fs.readFileSync(filePath)
-      })
+        data: fs.readFileSync(filePath)
+      }
+
+      core.info(options.data)
+
+      const response = await this.octokit.repos.uploadReleaseAsset(options)
 
       // Get the browser_download_url for the uploaded release asset from the response
 
       const {
         data: { browser_download_url: browserDownloadUrl }
-      } = uploadAssetResponse
+      } = response
 
       return browserDownloadUrl
     } catch (e) {
