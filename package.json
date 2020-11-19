@@ -1,6 +1,6 @@
 {
   "name": "upload-multiple-releases",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Upload multiple release assets ",
   "main": "index.js",
   "scripts": {
