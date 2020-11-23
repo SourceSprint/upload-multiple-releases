@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const core = require('@actions/core')
 const github = require('@actions/github')
+const mimeTypes = require('./mime')
 
 class CriticalError extends Error {
   constructor(message) {
@@ -31,6 +32,7 @@ class UploadManager {
     this.sha = github.context.sha
 
     this.uploadUrl = null
+    this.assets = null
   }
 
   async resolveTag() {
@@ -53,6 +55,12 @@ class UploadManager {
       if (release && this.overwrite) {
         core.info('Release exists, overwriting assets.')
         this.uploadUrl = release.upload_url
+
+        this.assets = release.assets.map((asset) => ({
+          id: asset.id,
+          name: asset.name
+        }))
+
         return
       }
 
@@ -79,40 +87,74 @@ class UploadManager {
       } = newRelease
 
       this.uploadUrl = uploadUrl
+      this.assets = []
     } catch (e) {
       core.setFailed(e.message)
     }
   }
 
-  async uploadFile({ filePath, fileType }) {
+  async uploadAsset({ filePath, fileType }) {
     try {
       if (!this.uploadUrl) {
         throw new CriticalError('Unresolved Tag')
       }
 
-      // Determine content-length for header to upload asset
-      const contentLength = fs.statSync(filePath).size
+      const name = path.basename(filePath)
+      const extension = path.extname(filePath)
 
-      // Setup headers for API call, see Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset for more information
-      const headers = {
-        'content-type': fileType || 'binary/octet-stream',
-        'content-length': contentLength
+      const asset = this.assets.find((asset) => asset.name == name)
+
+      if (asset) {
+        // Delete asset if overwrite is enabled and asset exists
+        if (!this.overwrite) {
+          throw new Error(`${filePath} already exists.`)
+        }
+
+        core.info(`Overwriting ${filePath}`)
+
+        const assetOptions = {
+          owner: this.owner,
+          repo: this.repo,
+          asset_id: asset.id
+        }
+
+        await octokit.repos.deleteReleaseAsset(assetOptions)
+      } else {
+        core.info(`Uploading ${filePath}`)
       }
 
-      // Upload a release asset
-      // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
-      // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
+      let contentType = 'binary/octet-stream'
+
+      if (fileType.length) {
+        contentType = fileType
+      } else {
+        if (extension.length) {
+          // Resolve mime when extension is available if available 
+          const fileMime = mimeTypes.find((item) => item.extension == extension)
+          if (fileMime) {
+            contentType = fileMime.mime
+          }
+        }
+      }
+
+      const contentLength = fs.statSync(filePath).size
+
+      const headers = {
+        'content-type': contentType,
+        'content-length': contentLength
+      }
 
       const options = {
         url: this.uploadUrl,
         headers,
-        name: path.basename(filePath),
+        name,
         data: fs.readFileSync(filePath)
       }
 
+      // Upload release
       const response = await this.octokit.repos.uploadReleaseAsset(options)
 
-      // Get the browser_download_url for the uploaded release asset from the response
+      core.info(`Uploaded ${filePath}`)
 
       const {
         data: { browser_download_url: browserDownloadUrl }
