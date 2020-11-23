@@ -118,7 +118,7 @@ class UploadManager {
           asset_id: asset.id
         }
 
-        await octokit.repos.deleteReleaseAsset(assetOptions)
+        await this.octokit.repos.deleteReleaseAsset(assetOptions)
       } else {
         core.info(`Uploading ${filePath}`)
       }
