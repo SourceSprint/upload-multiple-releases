@@ -37,13 +37,9 @@ const run = async () => {
     for (let fileConfig of filelist) {
       const { filePath } = fileConfig
 
-      core.info(`Uploading ${filePath}`)
-
-      const downloadUrl = await uploadManager.uploadFile(fileConfig)
+      const downloadUrl = await uploadManager.uploadAsset(fileConfig)
 
       if (downloadUrl) {
-        core.info(`Uploaded ${filePath}`)
-
         downloadUrls = [...downloadUrls, { url: downloadUrl, filePath }]
       }
     }
