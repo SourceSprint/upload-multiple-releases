@@ -9116,8 +9116,8 @@ const { FileManager } = __webpack_require__(2532)
 const run = async () => {
   try {
     // Get inputs from workflow file
-    const releaseConfig = `dist/*` // core.getInput('release_config', { required: true })
-    const tagName = `v1.0.0` // core.getInput('tag_name', { required: true })
+    const releaseConfig = core.getInput('release_config', { required: true })
+    const tagName = core.getInput('tag_name', { required: true })
     const releaseName = core.getInput('release_name', { required: false })
 
     const overwrite = core.getInput('overwrite', { required: false }) === 'true'
@@ -9291,7 +9291,7 @@ class UploadManager {
           asset_id: asset.id
         }
 
-        await octokit.repos.deleteReleaseAsset(assetOptions)
+        await this.octokit.repos.deleteReleaseAsset(assetOptions)
       } else {
         core.info(`Uploading ${filePath}`)
       }
