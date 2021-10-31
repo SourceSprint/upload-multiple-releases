@@ -4,7 +4,7 @@ import {
   UploadManager
 } from './upload-manager'
 
-import { githubToken } from './config/contants'
+import { githubToken } from './config/constants'
 
 const run = async () => {
   try {
