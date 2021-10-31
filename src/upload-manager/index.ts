@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import core from '@actions/core'
-import glob from 'glob'
+import glob from '@actions/glob'
 import github from '@actions/github'
 import mimeTypes from './mime.json'
 
@@ -80,25 +80,31 @@ class UploadManager {
     this.assets = []
   }
 
-  resolveFiles(filelist: string): SelectedFiles {
+  async resolveFiles(filelist: string) {
     const paths = `${filelist}`.split('\n').filter((line) => line.trim().length)
 
-    const files = paths.map((fileConfig: string): SelectedFiles => {
+    const files = paths.map(async (fileConfig: string) => {
       const [filePath, fileType] = fileConfig.split(' ')
 
       // Use glob to parse paths with wildcards
       if (filePath.indexOf('*') !== -1) {
-        const config = glob.sync(filePath)
-        return config.map((file) => ({ filePath: file, fileType }))
+        const globber = await glob.create(filePath)
+        const files = await globber.glob()
+        return <SelectedFiles>files.map((file) => ({
+          filePath: file,
+          fileType
+        }))
       }
 
-      return [{
+      return <SelectedFiles>[{
         filePath,
         fileType
       }]
     })
 
-    return [].concat(...files as [])
+    const results = await Promise.all(files)
+
+    return <SelectedFiles>[].concat(...results as [])
   }
 
   async resolveTag() {
