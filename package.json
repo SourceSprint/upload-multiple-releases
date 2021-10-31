@@ -1,11 +1,13 @@
 {
   "name": "upload-multiple-releases",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "Upload multiple release assets ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build src",
+    "ncc:build": "ncc build lib",
+    "compile": "tsc",
+    "build": "npm run compile && npm run ncc:build",
     "precommit": "npm run build && git add dist/"
   },
   "repository": {
@@ -25,11 +27,14 @@
   },
   "homepage": "https://github.com/boxpositron/upload-multiple-releases#readme",
   "dependencies": {
-    "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0",
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
     "glob": "^7.1.6"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.25.1"
+    "@types/glob": "^7.2.0",
+    "@types/node": "^16.11.6",
+    "@vercel/ncc": "^0.25.1",
+    "typescript": "^4.4.4"
   }
 }
