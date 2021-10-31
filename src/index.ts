@@ -47,7 +47,7 @@ const run = async () => {
 
     const manager = new UploadManager(options)
 
-    const filelist = manager.resolveFiles(releaseConfig)
+    const filelist = await manager.resolveFiles(releaseConfig)
 
     core.info(`Found ${filelist.length} asset(s)`)
     core.info(filelist.map((file) => file.filePath).join('\n'))
