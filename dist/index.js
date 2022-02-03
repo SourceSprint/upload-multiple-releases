@@ -408,7 +408,7 @@ var UploadManager = /** @class */ (function () {
                             name: name_1,
                             data: fs_1.default.readFileSync(filePath)
                         };
-                        // Upload release
+
                         return [4 /*yield*/, this.octokit.rest.repos.uploadReleaseAsset(options)];
                     case 4:
                         // Upload release
