@@ -1,12 +1,12 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 
 import {
   UploadManager
 } from './upload-manager'
 
-import { githubToken } from './config/constants'
+import { githubToken } from './config'
 
-const run = async () => {
+async function run() {
   try {
     // Get inputs from workflow file
     const releaseConfig = core.getInput('release_config', {

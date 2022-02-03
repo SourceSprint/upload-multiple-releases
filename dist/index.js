@@ -10,15 +10,14 @@ module.exports = JSON.parse("[{\"extension\":\".323\",\"mime\":\"text/h323\"},{\
 
 /***/ }),
 
-/***/ 8916:
+/***/ 6730:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.githubToken = void 0;
-var githubToken = process.env.GITHUB_TOKEN || '';
-exports.githubToken = githubToken;
+exports.githubToken = process.env.GITHUB_TOKEN || '';
 
 
 /***/ }),
@@ -28,6 +27,25 @@ exports.githubToken = githubToken;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -64,85 +82,84 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var core_1 = __importDefault(__webpack_require__(2186));
+var core = __importStar(__webpack_require__(2186));
 var upload_manager_1 = __webpack_require__(1512);
-var constants_1 = __webpack_require__(8916);
-var run = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var releaseConfig, tagName, releaseName, overwrite, draft, prerelease, options, manager, filelist, urls, _i, filelist_1, fileConfig, filePath, url, e_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 7, , 8]);
-                releaseConfig = core_1.default.getInput('release_config', {
-                    required: true
-                });
-                tagName = core_1.default.getInput('tag_name', {
-                    required: true
-                });
-                releaseName = core_1.default.getInput('release_name', {
-                    required: false
-                });
-                overwrite = core_1.default.getInput('overwrite', {
-                    required: false
-                }) === 'true';
-                draft = core_1.default.getInput('draft', {
-                    required: false
-                }) === 'true';
-                prerelease = core_1.default.getInput('prerelease', {
-                    required: false
-                }) === 'true';
-                options = {
-                    draft: draft,
-                    tagName: tagName,
-                    overwrite: overwrite,
-                    prerelease: prerelease,
-                    releaseName: releaseName,
-                    githubToken: constants_1.githubToken,
-                };
-                manager = new upload_manager_1.UploadManager(options);
-                return [4 /*yield*/, manager.resolveFiles(releaseConfig)];
-            case 1:
-                filelist = _a.sent();
-                core_1.default.info("Found " + filelist.length + " asset(s)");
-                core_1.default.info(filelist.map(function (file) { return file.filePath; }).join('\n'));
-                urls = [];
-                return [4 /*yield*/, manager.resolveTag()];
-            case 2:
-                _a.sent();
-                _i = 0, filelist_1 = filelist;
-                _a.label = 3;
-            case 3:
-                if (!(_i < filelist_1.length)) return [3 /*break*/, 6];
-                fileConfig = filelist_1[_i];
-                filePath = fileConfig.filePath;
-                return [4 /*yield*/, manager.uploadAsset(fileConfig)];
-            case 4:
-                url = _a.sent();
-                if (url) {
-                    urls.push({
-                        url: url,
-                        filePath: filePath
+var config_1 = __webpack_require__(6730);
+function run() {
+    return __awaiter(this, void 0, void 0, function () {
+        var releaseConfig, tagName, releaseName, overwrite, draft, prerelease, options, manager, filelist, urls, _i, filelist_1, fileConfig, filePath, url, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 7, , 8]);
+                    releaseConfig = core.getInput('release_config', {
+                        required: true
                     });
-                }
-                _a.label = 5;
-            case 5:
-                _i++;
-                return [3 /*break*/, 3];
-            case 6:
-                core_1.default.setOutput('browser_download_urls', JSON.stringify(urls, null, 2));
-                return [3 /*break*/, 8];
-            case 7:
-                e_1 = _a.sent();
-                core_1.default.setFailed(e_1.message);
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
-        }
+                    tagName = core.getInput('tag_name', {
+                        required: true
+                    });
+                    releaseName = core.getInput('release_name', {
+                        required: false
+                    });
+                    overwrite = core.getInput('overwrite', {
+                        required: false
+                    }) === 'true';
+                    draft = core.getInput('draft', {
+                        required: false
+                    }) === 'true';
+                    prerelease = core.getInput('prerelease', {
+                        required: false
+                    }) === 'true';
+                    options = {
+                        draft: draft,
+                        tagName: tagName,
+                        overwrite: overwrite,
+                        prerelease: prerelease,
+                        releaseName: releaseName,
+                        githubToken: config_1.githubToken,
+                    };
+                    manager = new upload_manager_1.UploadManager(options);
+                    return [4 /*yield*/, manager.resolveFiles(releaseConfig)];
+                case 1:
+                    filelist = _a.sent();
+                    core.info("Found " + filelist.length + " asset(s)");
+                    core.info(filelist.map(function (file) { return file.filePath; }).join('\n'));
+                    urls = [];
+                    return [4 /*yield*/, manager.resolveTag()];
+                case 2:
+                    _a.sent();
+                    _i = 0, filelist_1 = filelist;
+                    _a.label = 3;
+                case 3:
+                    if (!(_i < filelist_1.length)) return [3 /*break*/, 6];
+                    fileConfig = filelist_1[_i];
+                    filePath = fileConfig.filePath;
+                    return [4 /*yield*/, manager.uploadAsset(fileConfig)];
+                case 4:
+                    url = _a.sent();
+                    if (url) {
+                        urls.push({
+                            url: url,
+                            filePath: filePath
+                        });
+                    }
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6:
+                    core.setOutput('browser_download_urls', JSON.stringify(urls, null, 2));
+                    return [3 /*break*/, 8];
+                case 7:
+                    e_1 = _a.sent();
+                    core.setFailed(e_1.message);
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
+            }
+        });
     });
-}); };
+}
 if (require.main === require.cache[eval('__filename')]) {
     run();
 }
@@ -177,6 +194,8 @@ var CriticalError = /** @class */ (function (_super) {
     function CriticalError(message) {
         var _this = _super.call(this, message) || this;
         _this.name = 'CriticalError';
+        // Set the prototype explicitly.
+        Object.setPrototypeOf(_this, CriticalError.prototype);
         return _this;
     }
     return CriticalError;
@@ -191,6 +210,25 @@ exports.CriticalError = CriticalError;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -234,27 +272,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UploadManager = void 0;
 var fs_1 = __importDefault(__webpack_require__(5747));
 var path_1 = __importDefault(__webpack_require__(5622));
-var core_1 = __importDefault(__webpack_require__(2186));
-var glob_1 = __importDefault(__webpack_require__(8090));
-var github_1 = __importDefault(__webpack_require__(5438));
+var core = __importStar(__webpack_require__(2186));
+var glob = __importStar(__webpack_require__(8090));
+var github = __importStar(__webpack_require__(5438));
 var mime_json_1 = __importDefault(__webpack_require__(1965));
 var errors_1 = __webpack_require__(2050);
 var UploadManager = /** @class */ (function () {
     function UploadManager(options) {
-        this.tagName = options.tagName.replace('refs/tags/', '');
-        this.releaseName = options.releaseName.replace('refs/tags/', '');
-        this.overwrite = options.overwrite;
-        this.prerelease = options.prerelease;
-        this.draft = options.draft;
-        this.octokit = github_1.default.getOctokit(options.githubToken);
-        this.repo = github_1.default.context.repo.repo;
-        this.owner = github_1.default.context.repo.owner;
-        this.sha = github_1.default.context.sha;
-        this.uploadUrl = '';
-        this.assets = [];
-    }
-    UploadManager.prototype.resolveFiles = function (filelist) {
-        return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        this.resolveFiles = function (filelist) { return __awaiter(_this, void 0, void 0, function () {
             var paths, files, results;
             var _this = this;
             return __generator(this, function (_a) {
@@ -268,7 +294,7 @@ var UploadManager = /** @class */ (function () {
                                     case 0:
                                         _a = fileConfig.split(' '), filePath = _a[0], fileType = _a[1];
                                         if (!(filePath.indexOf('*') !== -1)) return [3 /*break*/, 3];
-                                        return [4 /*yield*/, glob_1.default.create(filePath)];
+                                        return [4 /*yield*/, glob.create(filePath)];
                                     case 1:
                                         globber = _b.sent();
                                         return [4 /*yield*/, globber.glob()];
@@ -291,17 +317,14 @@ var UploadManager = /** @class */ (function () {
                         return [2 /*return*/, [].concat.apply([], results)];
                 }
             });
-        });
-    };
-    UploadManager.prototype.resolveTag = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var releases, release, releaseName, newRelease, uploadUrl, e_1;
+        }); };
+        this.resolveTag = function () { return __awaiter(_this, void 0, void 0, function () {
+            var releases, release, releaseName, newRelease, uploadUrl;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        core_1.default.info('Resolving tag');
+                        core.info('Resolving tag');
                         return [4 /*yield*/, this.octokit.repos.listReleases({
                                 repo: this.repo,
                                 owner: this.owner
@@ -313,7 +336,7 @@ var UploadManager = /** @class */ (function () {
                             throw new errors_1.CriticalError('Release already exists.');
                         }
                         if (release && this.overwrite) {
-                            core_1.default.info('Release exists, overwriting assets.');
+                            core.info('Release exists, overwriting assets.');
                             this.uploadUrl = release.upload_url;
                             this.assets = release.assets.map(function (asset) { return ({
                                 id: asset.id,
@@ -325,7 +348,7 @@ var UploadManager = /** @class */ (function () {
                         if (this.releaseName.length) {
                             releaseName = this.releaseName;
                         }
-                        core_1.default.info('Creating release.');
+                        core.info('Creating release.');
                         return [4 /*yield*/, this.octokit.repos.createRelease({
                                 owner: this.owner,
                                 repo: this.repo,
@@ -341,19 +364,12 @@ var UploadManager = /** @class */ (function () {
                         uploadUrl = newRelease.data.upload_url;
                         this.uploadUrl = uploadUrl;
                         this.assets = [];
-                        return [3 /*break*/, 4];
-                    case 3:
-                        e_1 = _a.sent();
-                        core_1.default.setFailed(e_1.message);
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
-        });
-    };
-    UploadManager.prototype.uploadAsset = function (config) {
-        return __awaiter(this, void 0, void 0, function () {
-            var filePath, _a, fileType, name_1, extension_1, asset, assetOptions, contentType, fileMime, contentLength, headers, options, response, browserDownloadUrl, e_2;
+        }); };
+        this.uploadAsset = function (config) { return __awaiter(_this, void 0, void 0, function () {
+            var filePath, _a, fileType, name_1, extension_1, asset, assetOptions, contentType, fileMime, contentLength, headers, options, response, browserDownloadUrl, e_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -370,7 +386,7 @@ var UploadManager = /** @class */ (function () {
                         if (!this.overwrite) {
                             throw new Error(filePath + " already exists.");
                         }
-                        core_1.default.info("Overwriting " + filePath);
+                        core.info("Overwriting " + filePath);
                         assetOptions = {
                             owner: this.owner,
                             repo: this.repo,
@@ -381,7 +397,7 @@ var UploadManager = /** @class */ (function () {
                         _b.sent();
                         return [3 /*break*/, 3];
                     case 2:
-                        core_1.default.info("Uploading " + filePath);
+                        core.info("Uploading " + filePath);
                         _b.label = 3;
                     case 3:
                         contentType = fileType;
@@ -405,18 +421,17 @@ var UploadManager = /** @class */ (function () {
                         return [4 /*yield*/, this.octokit.repos.uploadReleaseAsset(options)];
                     case 4:
                         response = _b.sent();
-                        core_1.default.info("Uploaded " + filePath);
+                        core.info("Uploaded " + filePath);
                         browserDownloadUrl = response.data.browser_download_url;
                         return [2 /*return*/, browserDownloadUrl];
                     case 5:
-                        e_2 = _b.sent();
+                        e_1 = _b.sent();
                         switch (true) {
-                            case e_2 instanceof errors_1.CriticalError: {
-                                core_1.default.setFailed(e_2.message);
-                                break;
+                            case e_1 instanceof errors_1.CriticalError: {
+                                throw e_1;
                             }
                             default: {
-                                core_1.default.error(e_2);
+                                core.warning(e_1.message || e_1);
                                 break;
                             }
                         }
@@ -424,8 +439,19 @@ var UploadManager = /** @class */ (function () {
                     case 6: return [2 /*return*/];
                 }
             });
-        });
-    };
+        }); };
+        this.tagName = options.tagName.replace('refs/tags/', '');
+        this.releaseName = options.releaseName.replace('refs/tags/', '');
+        this.overwrite = options.overwrite;
+        this.prerelease = options.prerelease;
+        this.draft = options.draft;
+        this.octokit = github.getOctokit(options.githubToken);
+        this.repo = github.context.repo.repo;
+        this.owner = github.context.repo.owner;
+        this.sha = github.context.sha;
+        this.uploadUrl = '';
+        this.assets = [];
+    }
     return UploadManager;
 }());
 exports.UploadManager = UploadManager;
@@ -8029,7 +8055,7 @@ Object.defineProperty(Response.prototype, Symbol.toStringTag, {
 });
 
 const INTERNALS$2 = Symbol('Request internals');
-const URL = whatwgUrl.URL;
+const URL = Url.URL || whatwgUrl.URL;
 
 // fix an issue where "format", "parse" aren't a named export for node <10
 const parse_url = Url.parse;
@@ -8292,9 +8318,17 @@ AbortError.prototype = Object.create(Error.prototype);
 AbortError.prototype.constructor = AbortError;
 AbortError.prototype.name = 'AbortError';
 
+const URL$1 = Url.URL || whatwgUrl.URL;
+
 // fix an issue where "PassThrough", "resolve" aren't a named export for node <10
 const PassThrough$1 = Stream.PassThrough;
-const resolve_url = Url.resolve;
+
+const isDomainOrSubdomain = function isDomainOrSubdomain(destination, original) {
+	const orig = new URL$1(original).hostname;
+	const dest = new URL$1(destination).hostname;
+
+	return orig === dest || orig[orig.length - dest.length - 1] === '.' && orig.endsWith(dest);
+};
 
 /**
  * Fetch function
@@ -8382,7 +8416,19 @@ function fetch(url, opts) {
 				const location = headers.get('Location');
 
 				// HTTP fetch step 5.3
-				const locationURL = location === null ? null : resolve_url(request.url, location);
+				let locationURL = null;
+				try {
+					locationURL = location === null ? null : new URL$1(location, request.url).toString();
+				} catch (err) {
+					// error here can only be invalid URL in Location: header
+					// do not throw when options.redirect == manual
+					// let the user extract the errorneous redirect URL
+					if (request.redirect !== 'manual') {
+						reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, 'invalid-redirect'));
+						finalize();
+						return;
+					}
+				}
 
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
@@ -8429,6 +8475,12 @@ function fetch(url, opts) {
 							timeout: request.timeout,
 							size: request.size
 						};
+
+						if (!isDomainOrSubdomain(request.url, locationURL)) {
+							for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
+								requestOpts.headers.delete(name);
+							}
+						}
 
 						// HTTP-redirect fetch step 9
 						if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {

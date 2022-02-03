@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
-import core from '@actions/core'
-import glob from '@actions/glob'
-import github from '@actions/github'
+
+import * as core from '@actions/core'
+import * as glob from '@actions/glob'
+import * as github from '@actions/github'
+
 import mimeTypes from './mime.json'
 
 
 import { CriticalError } from './errors'
-
 
 
 interface UploadManagerOptions {
@@ -45,19 +46,19 @@ interface SelectedFile {
 type SelectedFiles = Array<SelectedFile>
 
 
-class UploadManager {
-  tagName: string
-  releaseName: string
-  draft: boolean
-  overwrite: boolean
-  prerelease: boolean
-  octokit: any
+export class UploadManager {
+  private tagName: string
+  private releaseName: string
+  private draft: boolean
+  private overwrite: boolean
+  private prerelease: boolean
+  private octokit: any
 
-  repo: string
-  owner: string
-  sha: string
-  uploadUrl: string
-  assets: Assets
+  private repo: string
+  private owner: string
+  private sha: string
+  private uploadUrl: string
+  private assets: Assets
 
 
   constructor(options: UploadManagerOptions) {
@@ -80,7 +81,7 @@ class UploadManager {
     this.assets = []
   }
 
-  async resolveFiles(filelist: string) {
+  resolveFiles = async (filelist: string) => {
     const paths = `${filelist}`.split('\n').filter((line) => line.trim().length)
 
     const files = paths.map(async (fileConfig: string) => {
@@ -107,67 +108,63 @@ class UploadManager {
     return <SelectedFiles>[].concat(...results as [])
   }
 
-  async resolveTag() {
-    try {
-      core.info('Resolving tag')
+  resolveTag = async () => {
+    core.info('Resolving tag')
 
-      const releases: Releases = await this.octokit.repos.listReleases({
-        repo: this.repo,
-        owner: this.owner
-      })
+    const releases: Releases = await this.octokit.repos.listReleases({
+      repo: this.repo,
+      owner: this.owner
+    })
 
 
-      const release = releases.find((release: Release) => release.tag_name == this.tagName)
+    const release = releases.find((release: Release) => release.tag_name == this.tagName)
 
-      if (release && !this.overwrite) {
-        throw new CriticalError('Release already exists.')
-      }
-
-      if (release && this.overwrite) {
-        core.info('Release exists, overwriting assets.')
-        this.uploadUrl = release.upload_url
-
-        this.assets = release.assets.map((asset: Asset) => ({
-          id: asset.id,
-          name: asset.name
-        }))
-
-        return
-      }
-
-      let releaseName = this.tagName.replace('v', '')
-
-      if (this.releaseName.length) {
-        releaseName = this.releaseName
-      }
-
-      core.info('Creating release.')
-      const newRelease = await this.octokit.repos.createRelease({
-        owner: this.owner,
-        repo: this.repo,
-        tag_name: this.tagName,
-        name: releaseName,
-        body: '',
-        draft: this.draft,
-        prerelease: this.prerelease,
-        target_commitish: this.sha
-      })
-
-      const {
-        data: { upload_url: uploadUrl }
-      } = newRelease
-
-      this.uploadUrl = uploadUrl
-
-      this.assets = []
-
-    } catch (e: any) {
-
-      core.setFailed(e.message)
+    if (release && !this.overwrite) {
+      throw new CriticalError('Release already exists.')
     }
+
+    if (release && this.overwrite) {
+      core.info('Release exists, overwriting assets.')
+      this.uploadUrl = release.upload_url
+
+      this.assets = release.assets.map((asset: Asset) => ({
+        id: asset.id,
+        name: asset.name
+      }))
+
+      return
+    }
+
+    let releaseName = this.tagName.replace('v', '')
+
+    if (this.releaseName.length) {
+      releaseName = this.releaseName
+    }
+
+    core.info('Creating release.')
+
+    const newRelease = await this.octokit.repos.createRelease({
+      owner: this.owner,
+      repo: this.repo,
+      tag_name: this.tagName,
+      name: releaseName,
+      body: '',
+      draft: this.draft,
+      prerelease: this.prerelease,
+      target_commitish: this.sha
+    })
+
+    const {
+      data: { upload_url: uploadUrl }
+    } = newRelease
+
+    this.uploadUrl = uploadUrl
+
+    this.assets = []
+
   }
 
-  async uploadAsset(config: SelectedFile) {
+  uploadAsset = async (config: SelectedFile) => {
     try {
 
       if (!this.uploadUrl.length) {
@@ -200,6 +197,7 @@ class UploadManager {
         }
 
         await this.octokit.repos.deleteReleaseAsset(assetOptions)
+
       } else {
         core.info(`Uploading ${filePath}`)
       }
@@ -243,22 +241,14 @@ class UploadManager {
 
       switch (true) {
         case e instanceof CriticalError: {
-          core.setFailed(e.message)
-          break;
+          throw e
         }
 
         default: {
-          core.error(e)
+          core.warning(e.message || e)
           break;
         }
       }
-
-
-
     }
   }
-}
-
-export {
-  UploadManager
 }

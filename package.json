@@ -1,11 +1,11 @@
 {
   "name": "upload-multiple-releases",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Upload multiple release assets ",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ncc:build": "ncc build lib",
+    "ncc:build": "ncc build lib --license licenses.txt",
     "compile": "tsc",
     "build": "npm run compile && npm run ncc:build",
     "precommit": "npm run build && git add dist/"
@@ -29,7 +29,8 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "@actions/glob": "^0.2.0"
+    "@actions/glob": "^0.2.0",
+    "axios": "^0.25.0"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
