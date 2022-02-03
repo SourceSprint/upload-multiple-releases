@@ -143,7 +143,7 @@ export class UploadManager {
 
     core.info('Creating release.')
 
-    const { data: newRelease } = await this.octokit.rest.repos.createRelease({
+    const response = await this.octokit.rest.repos.createRelease({
       owner: this.owner,
       repo: this.repo,
       tag_name: this.tagName,
@@ -156,7 +156,7 @@ export class UploadManager {
 
     const {
       data: { upload_url: uploadUrl }
-    } = newRelease
+    } = response
 
     this.uploadUrl = uploadUrl
 
