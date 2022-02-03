@@ -111,7 +111,7 @@ export class UploadManager {
   resolveTag = async () => {
     core.info('Resolving tag')
 
-    const releases: Releases = await this.octokit.repos.listReleases({
+    const releases: Releases = await this.octokit.rest.repos.listReleases({
       repo: this.repo,
       owner: this.owner
     })
@@ -143,7 +143,7 @@ export class UploadManager {
 
     core.info('Creating release.')
 
-    const newRelease = await this.octokit.repos.createRelease({
+    const newRelease = await this.octokit.rest.repos.createRelease({
       owner: this.owner,
       repo: this.repo,
       tag_name: this.tagName,
@@ -196,7 +196,7 @@ export class UploadManager {
           asset_id: asset.id
         }
 
-        await this.octokit.repos.deleteReleaseAsset(assetOptions)
+        await this.octokit.rest.repos.deleteReleaseAsset(assetOptions)
 
       } else {
         core.info(`Uploading ${filePath}`)
@@ -228,7 +228,7 @@ export class UploadManager {
       }
 
       // Upload release
-      const response = await this.octokit.repos.uploadReleaseAsset(options)
+      const response = await this.octokit.rest.repos.uploadReleaseAsset(options)
 
       core.info(`Uploaded ${filePath}`)
 
