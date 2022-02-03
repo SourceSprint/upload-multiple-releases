@@ -88,7 +88,7 @@ var upload_manager_1 = __webpack_require__(1512);
 var config_1 = __webpack_require__(6730);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var releaseConfig, tagName, releaseName, overwrite, draft, prerelease, options, manager, filelist, urls, _i, filelist_1, fileConfig, filePath, url, e_1;
+        var releaseConfig, tagName, releaseName, overwrite, draft, prerelease, options, manager, filelist, _i, filelist_1, fileConfig, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -125,7 +125,6 @@ function run() {
                     filelist = _a.sent();
                     core.info("Found " + filelist.length + " asset(s)");
                     core.info(filelist.map(function (file) { return file.filePath; }).join('\n'));
-                    urls = [];
                     return [4 /*yield*/, manager.resolveTag()];
                 case 2:
                     _a.sent();
@@ -134,23 +133,14 @@ function run() {
                 case 3:
                     if (!(_i < filelist_1.length)) return [3 /*break*/, 6];
                     fileConfig = filelist_1[_i];
-                    filePath = fileConfig.filePath;
                     return [4 /*yield*/, manager.uploadAsset(fileConfig)];
                 case 4:
-                    url = _a.sent();
-                    if (url) {
-                        urls.push({
-                            url: url,
-                            filePath: filePath
-                        });
-                    }
+                    _a.sent();
                     _a.label = 5;
                 case 5:
                     _i++;
                     return [3 /*break*/, 3];
-                case 6:
-                    core.setOutput('browser_download_urls', JSON.stringify(urls, null, 2));
-                    return [3 /*break*/, 8];
+                case 6: return [3 /*break*/, 8];
                 case 7:
                     e_1 = _a.sent();
                     core.setFailed(e_1.message);
@@ -319,18 +309,18 @@ var UploadManager = /** @class */ (function () {
             });
         }); };
         this.resolveTag = function () { return __awaiter(_this, void 0, void 0, function () {
-            var releases, release, releaseName, newRelease, uploadUrl;
+            var releases, release, releaseName, response, uploadUrl;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         core.info('Resolving tag');
-                        return [4 /*yield*/, this.octokit.repos.listReleases({
+                        return [4 /*yield*/, this.octokit.rest.repos.listReleases({
                                 repo: this.repo,
                                 owner: this.owner
                             })];
                     case 1:
-                        releases = _a.sent();
+                        releases = (_a.sent()).data;
                         release = releases.find(function (release) { return release.tag_name == _this.tagName; });
                         if (release && !this.overwrite) {
                             throw new errors_1.CriticalError('Release already exists.');
@@ -349,7 +339,7 @@ var UploadManager = /** @class */ (function () {
                             releaseName = this.releaseName;
                         }
                         core.info('Creating release.');
-                        return [4 /*yield*/, this.octokit.repos.createRelease({
+                        return [4 /*yield*/, this.octokit.rest.repos.createRelease({
                                 owner: this.owner,
                                 repo: this.repo,
                                 tag_name: this.tagName,
@@ -360,8 +350,8 @@ var UploadManager = /** @class */ (function () {
                                 target_commitish: this.sha
                             })];
                     case 2:
-                        newRelease = _a.sent();
-                        uploadUrl = newRelease.data.upload_url;
+                        response = _a.sent();
+                        uploadUrl = response.data.upload_url;
                         this.uploadUrl = uploadUrl;
                         this.assets = [];
                         return [2 /*return*/];
@@ -369,7 +359,7 @@ var UploadManager = /** @class */ (function () {
             });
         }); };
         this.uploadAsset = function (config) { return __awaiter(_this, void 0, void 0, function () {
-            var filePath, _a, fileType, name_1, extension_1, asset, assetOptions, contentType, fileMime, contentLength, headers, options, response, browserDownloadUrl, e_1;
+            var filePath, _a, fileType, name_1, extension_1, asset, assetOptions, contentType, fileMime, contentLength, headers, options, e_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -392,7 +382,7 @@ var UploadManager = /** @class */ (function () {
                             repo: this.repo,
                             asset_id: asset.id
                         };
-                        return [4 /*yield*/, this.octokit.repos.deleteReleaseAsset(assetOptions)];
+                        return [4 /*yield*/, this.octokit.rest.repos.deleteReleaseAsset(assetOptions)];
                     case 1:
                         _b.sent();
                         return [3 /*break*/, 3];
@@ -418,12 +408,13 @@ var UploadManager = /** @class */ (function () {
                             name: name_1,
                             data: fs_1.default.readFileSync(filePath)
                         };
-                        return [4 /*yield*/, this.octokit.repos.uploadReleaseAsset(options)];
+                        // Upload release
+                        return [4 /*yield*/, this.octokit.rest.repos.uploadReleaseAsset(options)];
                     case 4:
-                        response = _b.sent();
+                        // Upload release
+                        _b.sent();
                         core.info("Uploaded " + filePath);
-                        browserDownloadUrl = response.data.browser_download_url;
-                        return [2 /*return*/, browserDownloadUrl];
+                        return [3 /*break*/, 6];
                     case 5:
                         e_1 = _b.sent();
                         switch (true) {
