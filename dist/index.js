@@ -325,7 +325,7 @@ var UploadManager = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         core.info('Resolving tag');
-                        return [4 /*yield*/, this.octokit.repos.listReleases({
+                        return [4 /*yield*/, this.octokit.rest.repos.listReleases({
                                 repo: this.repo,
                                 owner: this.owner
                             })];
@@ -349,7 +349,7 @@ var UploadManager = /** @class */ (function () {
                             releaseName = this.releaseName;
                         }
                         core.info('Creating release.');
-                        return [4 /*yield*/, this.octokit.repos.createRelease({
+                        return [4 /*yield*/, this.octokit.rest.repos.createRelease({
                                 owner: this.owner,
                                 repo: this.repo,
                                 tag_name: this.tagName,
@@ -392,7 +392,7 @@ var UploadManager = /** @class */ (function () {
                             repo: this.repo,
                             asset_id: asset.id
                         };
-                        return [4 /*yield*/, this.octokit.repos.deleteReleaseAsset(assetOptions)];
+                        return [4 /*yield*/, this.octokit.rest.repos.deleteReleaseAsset(assetOptions)];
                     case 1:
                         _b.sent();
                         return [3 /*break*/, 3];
@@ -418,7 +418,7 @@ var UploadManager = /** @class */ (function () {
                             name: name_1,
                             data: fs_1.default.readFileSync(filePath)
                         };
-                        return [4 /*yield*/, this.octokit.repos.uploadReleaseAsset(options)];
+                        return [4 /*yield*/, this.octokit.rest.repos.uploadReleaseAsset(options)];
                     case 4:
                         response = _b.sent();
                         core.info("Uploaded " + filePath);
