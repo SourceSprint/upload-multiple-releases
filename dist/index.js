@@ -309,7 +309,7 @@ var UploadManager = /** @class */ (function () {
             });
         }); };
         this.resolveTag = function () { return __awaiter(_this, void 0, void 0, function () {
-            var releases, release, releaseName, newRelease, uploadUrl;
+            var releases, release, releaseName, response, uploadUrl;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -350,8 +350,8 @@ var UploadManager = /** @class */ (function () {
                                 target_commitish: this.sha
                             })];
                     case 2:
-                        newRelease = (_a.sent()).data;
-                        uploadUrl = newRelease.data.upload_url;
+                        response = _a.sent();
+                        uploadUrl = response.data.upload_url;
                         this.uploadUrl = uploadUrl;
                         this.assets = [];
                         return [2 /*return*/];
