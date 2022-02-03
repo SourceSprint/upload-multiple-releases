@@ -53,26 +53,14 @@ async function run() {
     core.info(filelist.map((file) => file.filePath).join('\n'))
 
 
-    const urls = []
 
     await manager.resolveTag()
 
     for (let fileConfig of filelist) {
-      const {
-        filePath
-      } = fileConfig
+      await manager.uploadAsset(fileConfig)
 
-      const url = await manager.uploadAsset(fileConfig)
-
-      if (url) {
-        urls.push({
-          url,
-          filePath
-        })
-      }
     }
 
-    core.setOutput('browser_download_urls', JSON.stringify(urls, null, 2))
   } catch (e: any) {
     core.setFailed(e.message)
   }
